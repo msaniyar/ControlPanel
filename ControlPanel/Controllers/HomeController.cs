@@ -24,6 +24,10 @@ namespace ControlPanel.Controllers
 
         private readonly IServices _service;
 
+        public HomeController()
+        {
+        }
+
         public HomeController(IServices service)
         {
             _service = service;
