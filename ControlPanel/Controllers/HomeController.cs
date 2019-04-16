@@ -7,17 +7,28 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO.Compression;
 using System.Net;
+using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography;
 using System.Web.Script.Serialization;
+using System.Xml.Schema;
 using Newtonsoft.Json;
 using RestSharp;
-
-
+using Newtonsoft.Json.Linq;
+using ControlPanel.JsonTreeCreate;
+using ControlPanel.Services;
 
 namespace ControlPanel.Controllers
 {
     public class HomeController : Controller
     {
+
+        private readonly IServices _service;
+
+        public HomeController(IServices service)
+        {
+            _service = service;
+        }
+
         // GET: Home
         [HttpGet]
         public ActionResult Index()
@@ -30,96 +41,37 @@ namespace ControlPanel.Controllers
         {
             if (postedFile == null) return View();
             var fileExtension = Path.GetExtension(postedFile.FileName);
+            var fileName = Path.GetFileNameWithoutExtension(postedFile.FileName);
 
-            if (!Validation(username, password))
+            if (!_service.CredentialsValidation(username, password))
             {
                 ViewBag.Message = "Password or username is wrong.";
                 return View();
             }
 
-            if (!ZipValidation(fileExtension))
+            if (_service.ZipValidation(fileExtension))
             {
                 ViewBag.Message = "Please provide a zip file.";
                 return View();
             }
 
-            var path = Server.MapPath("~/Uploads/");
-            if (!Directory.Exists(path))
+           var treePath = _service.FileProcess(postedFile);
+           var directoryInfo = new DirectoryInfo(treePath);
+           var treeResult = directoryInfo.ToJson(f => f.LastWriteTimeUtc);
+
+
+            if (!_service.SendRequest(username, password, treeResult))
             {
-                Directory.CreateDirectory(path);
+                ViewBag.Message = "En error occured. Please try again.";
             }
-
-            postedFile.SaveAs(path + Path.GetFileName(postedFile.FileName));
-
-            var newFileName = Path.Combine(path, postedFile.FileName);
-
-            var listEntries = new List<string>();
-            using (var archive = ZipFile.OpenRead(newFileName))
+            else
             {
-                foreach (var entry in archive.Entries)
-                {
-                    listEntries.Add(entry.ToString());
-                }
+                ViewBag.Message = "File read and sent to the database. Tree is listed:    ";
+                ViewBag.Message += treeResult;
             }
-
-            ViewBag.Message = "File read and sent to the database. Tree is listed below";
-
-            foreach (var list in listEntries)
-            {
-                ViewBag.Message += list + "\n";
-            }
-
-
-            ViewBag.Message += SendRequest(username, password);
-
 
 
             return View();
         }
-
-
-        private static bool Validation(string username, string password)
-        {
-
-            var storedPassword = ConfigurationManager.AppSettings["Password"];
-            var storedUserName = ConfigurationManager.AppSettings["UserName"];
-
-            if (storedUserName != username || storedPassword != password)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private static bool ZipValidation(string fileExtension)
-        {
-
-            if (fileExtension != ".zip")
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        private static object SendRequest(string username, string password)
-        {
-            var request = new RestRequest(Method.POST);
-            var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
-
-            request.AddJsonBody(new {password = password, username = username});
-            request.AddHeader("Content-Type", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
-            request.AddHeader("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
-
-            var client = new RestClient(endpoint) { Timeout = 30000 };
-
-            var response = client.Execute(request);
-            var message = JsonConvert.DeserializeObject(response.Content);
-            return message;
-
-        }
-
     }
 }

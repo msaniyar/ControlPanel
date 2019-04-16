@@ -129,7 +129,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="JsonTreeCreate\JsonTreeCreate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IServices.cs" />
+    <Compile Include="Services\LogicServices.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\main.css" />
