@@ -22,11 +22,7 @@ namespace ControlPanel.Controllers
     public class HomeController : Controller
     {
 
-        private readonly IServices _service;
-
-        public HomeController()
-        {
-        }
+        private  IServices _service;
 
         public HomeController(IServices service)
         {
@@ -53,7 +49,7 @@ namespace ControlPanel.Controllers
                 return View();
             }
 
-            if (_service.ZipValidation(fileExtension))
+            if (!_service.ZipValidation(fileExtension))
             {
                 ViewBag.Message = "Please provide a zip file.";
                 return View();

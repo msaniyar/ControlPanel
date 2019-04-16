@@ -47,7 +47,7 @@ namespace ControlPanel.Services
             DirectoryDelete(path);
             DirectoryDelete(pathTree);
 
-            postedFile.SaveAs(path + Path.GetFileName(postedFile.FileName));
+            postedFile.SaveAs(Path.Combine(path, postedFile.FileName));
             ZipFile.ExtractToDirectory(Path.Combine(path, postedFile.FileName), pathTree);
 
             return pathTree;
