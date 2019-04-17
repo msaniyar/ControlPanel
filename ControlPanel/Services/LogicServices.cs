@@ -11,6 +11,7 @@ using System.Web.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using RestSharp.Authenticators;
 
 namespace ControlPanel.Services
 {
@@ -72,25 +73,22 @@ namespace ControlPanel.Services
             var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
             var secret = ConfigurationManager.AppSettings["SecretKey"];
             var treeString = JsonConvert.SerializeObject(tree);
-
+            var authenticator = new HttpBasicAuthenticator(username, password);
             var treeEncrypted = Encrypt(treeString, secret);
 
 
             var parameters = new JObject
             (
-                new JProperty("username", username),
-                new JProperty("password", password),
                 new JProperty("tree", treeEncrypted)
             );
 
-            //request.AddJsonBody(request.JsonSerializer.Serialize(tree));
             request.AddParameter("application/json", parameters, RestSharp.ParameterType.RequestBody);
 
             request.AddHeader("Content-Type", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
             request.AddHeader("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
 
             var client = new RestClient(endpoint) { Timeout = 30000 };
-
+            authenticator.Authenticate(client, request);
             var response = client.Execute(request);
             return response.StatusCode == HttpStatusCode.OK;
         }
