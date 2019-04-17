@@ -4,7 +4,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
+using System.Web.Helpers;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 
@@ -13,8 +17,8 @@ namespace ControlPanel.Services
     public class LogicServices : IServices
     {
 
-        public string path = Path.Combine(System.AppContext.BaseDirectory, "Uploads");
-        public string pathTree = Path.Combine(System.AppContext.BaseDirectory, "Tree");
+        public string Path = System.IO.Path.Combine(System.AppContext.BaseDirectory, "Uploads");
+        public string PathTree = System.IO.Path.Combine(System.AppContext.BaseDirectory, "Tree");
 
         public bool CredentialsValidation(string username, string password)
         {
@@ -22,38 +26,27 @@ namespace ControlPanel.Services
             var storedPassword = ConfigurationManager.AppSettings["Password"];
             var storedUserName = ConfigurationManager.AppSettings["UserName"];
 
-            if (storedUserName != username || storedPassword != password)
-            {
-                return false;
-            }
-
-            return true;
+            return storedUserName == username && storedPassword == password;
         }
 
         public bool ZipValidation(string fileExtension)
         {
-
-            if (fileExtension != ".zip")
-            {
-                return false;
-            }
-
-            return true;
+            return fileExtension == ".zip";
         }
 
         public string FileProcess(HttpPostedFileBase postedFile)
         {
 
-            DirectoryDelete(path);
-            DirectoryDelete(pathTree);
+            DirectoryDelete(Path);
+            DirectoryDelete(PathTree);
 
-            postedFile.SaveAs(Path.Combine(path, postedFile.FileName));
-            ZipFile.ExtractToDirectory(Path.Combine(path, postedFile.FileName), pathTree);
+            postedFile.SaveAs(System.IO.Path.Combine(Path, postedFile.FileName));
+            ZipFile.ExtractToDirectory(System.IO.Path.Combine(Path, postedFile.FileName), PathTree);
 
-            return pathTree;
+            return PathTree;
         }
 
-        private void DirectoryDelete(string path)
+        private static void DirectoryDelete(string path)
         {
             if (!Directory.Exists(path))
             {
@@ -77,11 +70,17 @@ namespace ControlPanel.Services
         {
             var request = new RestRequest(Method.POST);
             var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
+            var secret = ConfigurationManager.AppSettings["SecretKey"];
+            var treeString = JsonConvert.SerializeObject(tree);
+
+            var treeEncrypted = Encrypt(treeString, secret);
+
+
             var parameters = new JObject
             (
                 new JProperty("username", username),
                 new JProperty("password", password),
-                new JProperty("tree", tree)
+                new JProperty("tree", treeEncrypted)
             );
 
             //request.AddJsonBody(request.JsonSerializer.Serialize(tree));
@@ -93,14 +92,50 @@ namespace ControlPanel.Services
             var client = new RestClient(endpoint) { Timeout = 30000 };
 
             var response = client.Execute(request);
-            if (!(response.StatusCode == HttpStatusCode.OK))
-            {
-                return false;
-            }
-
-            return true;
-
-
+            return response.StatusCode == HttpStatusCode.OK;
         }
+
+        public static string Encrypt(string value, string password)
+        {
+            return Encrypt<AesManaged>(value, password);
+        }
+        public static string Encrypt<T>(string value, string password)
+            where T : SymmetricAlgorithm, new()
+        {
+
+            var vectorBytes = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["vector"]);
+            var saltBytes = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["salt"]);
+            var valueBytes = Encoding.UTF8.GetBytes(value);
+            var iterations = ConfigurationManager.AppSettings["iteration"];
+            var keySize = ConfigurationManager.AppSettings["keysize"];
+
+
+            byte[] encrypted;
+            var passwordBytes =
+                new Rfc2898DeriveBytes(password, saltBytes, int.Parse(iterations));
+
+            using (var cipher = new T())
+            {
+                var keyBytes = passwordBytes.GetBytes(int.Parse(keySize) / 8);
+
+                cipher.Mode = CipherMode.CBC;
+
+                using (var encrypt = cipher.CreateEncryptor(keyBytes, vectorBytes))
+                {
+                    using (var to = new MemoryStream())
+                    {
+                        using (var writer = new CryptoStream(to, encrypt, CryptoStreamMode.Write))
+                        {
+                            writer.Write(valueBytes, 0, valueBytes.Length);
+                            writer.FlushFinalBlock();
+                            encrypted = to.ToArray();
+                        }
+                    }
+                }
+                cipher.Clear();
+            }
+            return Convert.ToBase64String(encrypted);
+        }
+
     }
 }

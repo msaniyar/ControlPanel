@@ -22,7 +22,7 @@ namespace ControlPanel.Controllers
     public class HomeController : Controller
     {
 
-        private  IServices _service;
+        private readonly IServices _service;
 
         public HomeController(IServices service)
         {
