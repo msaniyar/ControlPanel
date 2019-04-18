@@ -117,7 +117,7 @@ namespace ControlPanel.Services
             }
         }
 
-        static byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
+        private static byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
         {
             byte[] encrypted;
             // Create a new AesManaged.    
