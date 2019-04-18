@@ -60,6 +60,7 @@ namespace ControlPanel.Services
                 {
                     file.Delete();
                 }
+
                 foreach (var directory in directoryInfo.GetDirectories())
                 {
                     directory.Delete(true);
@@ -72,9 +73,11 @@ namespace ControlPanel.Services
             var request = new RestRequest(Method.POST);
             var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
             var secret = ConfigurationManager.AppSettings["SecretKey"];
+            var vector = ConfigurationManager.AppSettings["vector"];
+
             var treeString = JsonConvert.SerializeObject(tree);
             var authenticator = new HttpBasicAuthenticator(username, password);
-            var treeEncrypted = Encrypt(treeString, secret);
+            var treeEncrypted = EncryptAesManaged(treeString, secret, vector);
 
 
             var parameters = new JObject
@@ -88,54 +91,59 @@ namespace ControlPanel.Services
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Accept", "application/json");
 
-            var client = new RestClient(endpoint) { Timeout = 30000 };
+            var client = new RestClient(endpoint) {Timeout = 30000};
             authenticator.Authenticate(client, request);
             var response = client.Execute(request);
             return response.StatusCode == HttpStatusCode.OK;
         }
 
-        public static string Encrypt(string value, string password)
+        public static string EncryptAesManaged(string raw, string key, string vector)
         {
-            return Encrypt<AesManaged>(value, password);
-        }
-        public static string Encrypt<T>(string value, string password)
-            where T : SymmetricAlgorithm, new()
-        {
-
-            var vectorBytes = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["vector"]);
-            var saltBytes = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["salt"]);
-            var valueBytes = Encoding.UTF8.GetBytes(value);
-            var iterations = ConfigurationManager.AppSettings["iteration"];
-            var keySize = ConfigurationManager.AppSettings["keysize"];
-
-
-            byte[] encrypted;
-            var passwordBytes =
-                new Rfc2898DeriveBytes(password, saltBytes, int.Parse(iterations));
-
-            using (var cipher = new T())
+            try
             {
-                var keyBytes = passwordBytes.GetBytes(int.Parse(keySize) / 8);
 
-                cipher.Mode = CipherMode.CBC;
-                cipher.Padding = PaddingMode.PKCS7;
-
-                using (var encrypt = cipher.CreateEncryptor(keyBytes, vectorBytes))
+                // Create Aes that generates a new key and initialization vector (IV).    
+                // Same key must be used in encryption and decryption    
+                using (AesManaged aes = new AesManaged())
                 {
-                    using (var to = new MemoryStream())
+                    aes.Mode = CipherMode.ECB;
+                    // Encrypt string    
+                    return Convert.ToBase64String(Encrypt(raw, Convert.FromBase64String(key), Convert.FromBase64String(vector)));
+                }
+            }
+            catch (Exception)
+            {
+                return String.Empty;
+            }
+        }
+
+        static byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
+        {
+            byte[] encrypted;
+            // Create a new AesManaged.    
+            using (AesManaged aes = new AesManaged())
+            {
+                // Create encryptor    
+                ICryptoTransform encryptor = aes.CreateEncryptor(Key, IV);
+                // Create MemoryStream    
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    // Create crypto stream using the CryptoStream class. This class is the key to encryption    
+                    // and encrypts and decrypts data from any given stream. In this case, we will pass a memory stream    
+                    // to encrypt    
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                     {
-                        using (var writer = new CryptoStream(to, encrypt, CryptoStreamMode.Write))
-                        {
-                            writer.Write(valueBytes, 0, valueBytes.Length);
-                            writer.FlushFinalBlock();
-                            encrypted = to.ToArray();
-                        }
+                        // Create StreamWriter and write data to a stream    
+                        using (StreamWriter sw = new StreamWriter(cs))
+                            sw.Write(plainText);
+                        encrypted = ms.ToArray();
                     }
                 }
-                cipher.Clear();
             }
-            return Convert.ToBase64String(encrypted);
-        }
 
+            // Return encrypted data    
+            return encrypted;
+
+        }
     }
 }
