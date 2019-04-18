@@ -79,13 +79,14 @@ namespace ControlPanel.Services
 
             var parameters = new JObject
             (
+                new JProperty("id", Guid.NewGuid()),
                 new JProperty("tree", treeEncrypted)
             );
 
             request.AddParameter("application/json", parameters, RestSharp.ParameterType.RequestBody);
 
-            request.AddHeader("Content-Type", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
-            request.AddHeader("Accept", "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Accept", "application/json");
 
             var client = new RestClient(endpoint) { Timeout = 30000 };
             authenticator.Authenticate(client, request);
