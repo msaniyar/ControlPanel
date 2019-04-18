@@ -118,6 +118,7 @@ namespace ControlPanel.Services
                 var keyBytes = passwordBytes.GetBytes(int.Parse(keySize) / 8);
 
                 cipher.Mode = CipherMode.CBC;
+                cipher.Padding = PaddingMode.PKCS7;
 
                 using (var encrypt = cipher.CreateEncryptor(keyBytes, vectorBytes))
                 {
