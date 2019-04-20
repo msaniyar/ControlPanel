@@ -1,33 +1,32 @@
 ﻿<html>
 <head>
-    <meta name="viewport" content="width=device-width"/>
-    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="~/Content/main.css">
-
     <title>Index</title>
 </head>
 <body>
-    <div>
-        @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            <h2>This app gets zip file and inserts its content to database.</h2>
-            <h2>Upload your zip file, enter your username and password.</h2>
-            <br />
-            <br />
-            <input type="file" name="postedFile" />
-            <hr />
-
-            <input type="text" placeholder="UserName" name="username" />
-            <br />
-            <input type="password" placeholder="Password" name="password" />
-            <br />
-
-            <button type="submit">Upload</button>
-            <br />
-            <br />
-            <span style="color:yellowgreen">@ViewBag.Message</span>
-        }
-    </div>
+<div>
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <br />
+        <br />
+        <h2>This app gets zip file and inserts its content to database.</h2>
+        <h2>Upload your zip file, enter your username and password.</h2>
+        <br />
+        <br />
+        <input type="file" name ="postedFile" id="file" class="file" />
+        <label for="file">Choose a file</label>
+        <br />
+        <br />
+        <input type="text" placeholder="UserName" name="username" class="inputText"/>
+        <br />
+        <input type="password" placeholder="Password" name="password" class="inputText" />
+        <br />
+        <br />
+        <button type="submit" class="submitClass">Upload</button>
+        <br />
+        <br />
+        <span style="color:green">@ViewBag.Message</span>
+    }
+</div>
 </body>
 </html>

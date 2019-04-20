@@ -39,7 +39,11 @@ namespace ControlPanel.Controllers
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase postedFile, string username, string password)
         {
-            if (postedFile == null) return View();
+            if (postedFile == null)
+            {
+                ViewBag.Message = "Please provide a zip file.";
+                return View();
+            }
             var fileExtension = Path.GetExtension(postedFile.FileName);
             var fileName = Path.GetFileNameWithoutExtension(postedFile.FileName);
 

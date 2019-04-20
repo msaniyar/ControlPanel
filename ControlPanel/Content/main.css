@@ -1,73 +1,73 @@
 ﻿body {
-    font: 13px/20px "Lucida Grande", Tahoma, Verdana, sans-serif;
+    font: 13px/20px "Poppins", sans-serif;
     color: #404040;
-    background: #0ca3d2;
+    background: #DBB2B2;
     position: center;
     margin-left: 25%;
     margin-right: 25%;
-}
-
-
-
-body input {
-    font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
-    font-size: 14px;
+    text-align: center;
 }
 
     body h2 {
-        margin-left: 8%;
-        font-family: 'Lucida Grande', Tahoma, Verdana, sans-serif;
+        font-family: 'Poppins', sans-serif;
         font-size: 16px;
-        color: darkgreen;
+        color: #876262;
+        text-align: match-parent;
     }
 
-    body input[type=text], input[type=password] {
-        margin: 5px;
-        margin-left: 25%;
-        padding: 0 10px;
-        width: 200px;
-        height: 34px;
-        color: #404040;
-        background: white;
-        border: 1px solid;
-        border-color: #c4c4c4 #d1d1d1 #d4d4d4;
-        border-radius: 2px;
-        outline: 5px solid #eff4f7;
-        -moz-outline-radius: 3px;
-        -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
-    }
-
-
-body input[type=file] {
-    margin: 10px;
-    margin-left: 18%;
-    position: relative;
-    padding: 20 30px;
-    width: 300px;
-    height: 50px;
+.inputText {
+    margin: 5px;
+    padding: 0 10px;
+    width: 200px;
+    height: 34px;
     color: #404040;
-    background: grey;
+    background: white;
     border: 1px solid;
     border-color: #c4c4c4 #d1d1d1 #d4d4d4;
-    border-radius: 1px;
-    outline: 4px solid #eff4f7;
-    -moz-outline-radius: 2px;
-    -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+    outline: 5px solid #eff4f7;
+
 }
 
+.file {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute !important;
+    white-space: nowrap;
+    width: 1px;  
+}
 
-    body input[type=text]:focus, input[type=password]:focus {
-        border-color: #7dc9e2;
-        outline-color: #dceefc;
-        outline-offset: 0;
-    }
+.file + label {
+    background-color: #000;
+    border-radius: 4rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    height: 4rem;
+    line-height: 4rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    transition: background-color 0.3s;
+}
+ 
+.file:focus + label,
+.file+ label:hover {
+    background-color: #f15d22;
+}
+ 
+.file:focus + label {
+    outline: 1px dotted #000;
+    outline: -webkit-focus-ring-color auto 5px;
+}
 
-body button[type=submit] {
+.submitClass {
     padding: 0 18px;
     margin: 5px;
-    margin-left: 34%;
     height: 29px;
     font-size: 12px;
     font-weight: bold;
@@ -89,9 +89,9 @@ body button[type=submit] {
     box-shadow: inset 0 1px white, 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-body input[type=submit]:active {
-    background: #cde5ef;
-    border-color: #9eb9c2 #b3c0c8 #b4ccce;
-    -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-}
+    .submitclass:active {
+        background: #cde5ef;
+        border-color: #9eb9c2 #b3c0c8 #b4ccce;
+        -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+    }
