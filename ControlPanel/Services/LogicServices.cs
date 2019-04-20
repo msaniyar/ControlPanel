@@ -91,7 +91,7 @@ namespace ControlPanel.Services
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Accept", "application/json");
 
-            var client = new RestClient(endpoint) {Timeout = 30000};
+            var client = new RestClient(endpoint + "Data/Add") {Timeout = 30000};
             authenticator.Authenticate(client, request);
             var response = client.Execute(request);
             return response.StatusCode == HttpStatusCode.OK;
@@ -104,7 +104,7 @@ namespace ControlPanel.Services
 
                 // Create Aes that generates a new key and initialization vector (IV).    
                 // Same key must be used in encryption and decryption    
-                using (AesManaged aes = new AesManaged())
+                using (var aes = new AesManaged())
                 {
                     aes.Mode = CipherMode.ECB;
                     // Encrypt string    
@@ -113,7 +113,7 @@ namespace ControlPanel.Services
             }
             catch (Exception)
             {
-                return String.Empty;
+                return string.Empty;
             }
         }
 
@@ -121,20 +121,20 @@ namespace ControlPanel.Services
         {
             byte[] encrypted;
             // Create a new AesManaged.    
-            using (AesManaged aes = new AesManaged())
+            using (var aes = new AesManaged())
             {
                 // Create encryptor    
-                ICryptoTransform encryptor = aes.CreateEncryptor(Key, IV);
+                var encryptor = aes.CreateEncryptor(Key, IV);
                 // Create MemoryStream    
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     // Create crypto stream using the CryptoStream class. This class is the key to encryption    
                     // and encrypts and decrypts data from any given stream. In this case, we will pass a memory stream    
                     // to encrypt    
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                     {
                         // Create StreamWriter and write data to a stream    
-                        using (StreamWriter sw = new StreamWriter(cs))
+                        using (var sw = new StreamWriter(cs))
                             sw.Write(plainText);
                         encrypted = ms.ToArray();
                     }
