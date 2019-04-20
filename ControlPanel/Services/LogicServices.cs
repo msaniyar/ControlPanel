@@ -97,6 +97,10 @@ namespace ControlPanel.Services
         /// <returns></returns>
         public string SendRequest(string username, string password, JObject tree)
         {
+            //We can delete files again we are done with them.
+            DirectoryDelete(Path);
+            DirectoryDelete(PathTree);
+
             var request = new RestRequest(Method.POST);
             var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
             var secret = ConfigurationManager.AppSettings["SecretKey"];
