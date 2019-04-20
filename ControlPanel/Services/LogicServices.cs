@@ -125,12 +125,7 @@ namespace ControlPanel.Services
             var client = new RestClient(endpoint + "Data/Add") {Timeout = 30000};
             authenticator.Authenticate(client, request);
             var response = client.Execute(request);
-            if (response.IsSuccessful)
-            {
-                return JsonConvert.DeserializeObject(response.Content).ToString();
-            }
-
-            return string.Empty;
+            return response.IsSuccessful ? JsonConvert.DeserializeObject(response.Content).ToString() : string.Empty;
         }
 
 
