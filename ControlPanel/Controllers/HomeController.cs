@@ -29,13 +29,23 @@ namespace ControlPanel.Controllers
             _service = service;
         }
 
-        // GET: Home
+        /// <summary>
+        /// Returns initial view of user interface
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Index()
         {
             return View();
         }
 
+        /// <summary>
+        /// This method is getting file from user's interface and calls for validation.
+        /// </summary>
+        /// <param name="postedFile"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase postedFile, string username, string password)
         {

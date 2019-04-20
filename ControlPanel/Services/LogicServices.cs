@@ -21,6 +21,12 @@ namespace ControlPanel.Services
         public string Path = System.IO.Path.Combine(System.AppContext.BaseDirectory, "Uploads");
         public string PathTree = System.IO.Path.Combine(System.AppContext.BaseDirectory, "Tree");
 
+        /// <summary>
+        /// Validate username and password against pre-configured values.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public bool CredentialsValidation(string username, string password)
         {
 
@@ -30,11 +36,21 @@ namespace ControlPanel.Services
             return storedUserName == username && storedPassword == password;
         }
 
+        /// <summary>
+        /// Zip file suffix validation.
+        /// </summary>
+        /// <param name="fileExtension"></param>
+        /// <returns></returns>
         public bool ZipValidation(string fileExtension)
         {
             return fileExtension == ".zip";
         }
 
+        /// <summary>
+        /// Gets zip file and extract it to directory for further processing.
+        /// </summary>
+        /// <param name="postedFile"></param>
+        /// <returns></returns>
         public string FileProcess(HttpPostedFileBase postedFile)
         {
 
@@ -47,6 +63,10 @@ namespace ControlPanel.Services
             return PathTree;
         }
 
+        /// <summary>
+        /// Delete directory for re-use according to path.
+        /// </summary>
+        /// <param name="path"></param>
         private static void DirectoryDelete(string path)
         {
             if (!Directory.Exists(path))
@@ -68,6 +88,13 @@ namespace ControlPanel.Services
             }
         }
 
+        /// <summary>
+        /// HTTP Post request sending to remote application with basic authentication and encryption.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="tree"></param>
+        /// <returns></returns>
         public bool SendRequest(string username, string password, JObject tree)
         {
             var request = new RestRequest(Method.POST);
@@ -97,6 +124,14 @@ namespace ControlPanel.Services
             return response.StatusCode == HttpStatusCode.OK;
         }
 
+
+        /// <summary>
+        /// Static method for calling Encrypt method.
+        /// </summary>
+        /// <param name="raw"></param>
+        /// <param name="key"></param>
+        /// <param name="vector"></param>
+        /// <returns></returns>
         public static string EncryptAesManaged(string raw, string key, string vector)
         {
             try
@@ -117,6 +152,14 @@ namespace ControlPanel.Services
             }
         }
 
+
+        /// <summary>
+        /// Encrypt given string with using AES encryption.
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="Key"></param>
+        /// <param name="IV"></param>
+        /// <returns></returns>
         private static byte[] Encrypt(string plainText, byte[] Key, byte[] IV)
         {
             byte[] encrypted;
