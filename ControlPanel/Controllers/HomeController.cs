@@ -72,20 +72,8 @@ namespace ControlPanel.Controllers
            var treePath = _service.FileProcess(postedFile);
            var directoryInfo = new DirectoryInfo(treePath);
            var treeResult = directoryInfo.ToJson(f => f.LastWriteTimeUtc);
-           var result = _service.SendRequest(username, password, treeResult);
-
-            if (string.IsNullOrEmpty(result))
-            {
-                ViewBag.Message = "En error occured. Please try again.";
-            }
-            else
-            {
-                ViewBag.Message = "File read and sent to the database. ID in database:    ";
-                ViewBag.Message += result;
-            }
-
-
-            return View();
+           ViewBag.Message = _service.SendRequest(username, password, treeResult);
+           return View();
         }
     }
 }

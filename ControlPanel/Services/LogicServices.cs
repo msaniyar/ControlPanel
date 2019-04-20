@@ -125,7 +125,14 @@ namespace ControlPanel.Services
             var client = new RestClient(endpoint + "Data/Add") {Timeout = 30000};
             authenticator.Authenticate(client, request);
             var response = client.Execute(request);
-            return response.IsSuccessful ? JsonConvert.DeserializeObject(response.Content).ToString() : string.Empty;
+            Console.WriteLine(response.Content);
+            Console.WriteLine(response.ErrorMessage);
+
+            Console.WriteLine(response.ErrorException);
+
+            return response.IsSuccessful 
+                ? "File read and sent to the database. ID of the record: " + response.Content
+                : "An error occured, please contact to system administrator. ErrorCode: " + response.StatusCode;
         }
 
 
