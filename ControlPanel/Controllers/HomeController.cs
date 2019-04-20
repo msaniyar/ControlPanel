@@ -74,7 +74,7 @@ namespace ControlPanel.Controllers
            var treeResult = directoryInfo.ToJson(f => f.LastWriteTimeUtc);
            var result = _service.SendRequest(username, password, treeResult);
 
-            if (result == String.Empty)
+            if (string.IsNullOrEmpty(result))
             {
                 ViewBag.Message = "En error occured. Please try again.";
             }
