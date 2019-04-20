@@ -95,7 +95,7 @@ namespace ControlPanel.Services
         /// <param name="password"></param>
         /// <param name="tree"></param>
         /// <returns></returns>
-        public bool SendRequest(string username, string password, JObject tree)
+        public string SendRequest(string username, string password, JObject tree)
         {
             var request = new RestRequest(Method.POST);
             var endpoint = ConfigurationManager.AppSettings["RemoteURL"];
@@ -121,7 +121,12 @@ namespace ControlPanel.Services
             var client = new RestClient(endpoint + "Data/Add") {Timeout = 30000};
             authenticator.Authenticate(client, request);
             var response = client.Execute(request);
-            return response.StatusCode == HttpStatusCode.OK;
+            if (response.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject(response.Content).ToString();
+            }
+
+            return string.Empty;
         }
 
 

@@ -13,7 +13,7 @@ namespace ControlPanel.Services
         bool CredentialsValidation(string username, string password);
         bool ZipValidation(string fileExtension);
         string FileProcess(HttpPostedFileBase postedFile);
-        bool SendRequest(string username, string password, JObject tree);
+        string SendRequest(string username, string password, JObject tree);
 
 
     }
