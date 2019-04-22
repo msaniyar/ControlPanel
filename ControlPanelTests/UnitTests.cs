@@ -54,10 +54,11 @@ namespace ControlPanelTests
                 new JProperty("id", Guid.NewGuid()),
                 new JProperty("tree", "{\"test.txt\":\"2019-04-13T16:31:38Z\"}")
             );
+
             var result = _services.SendRequest(username, password, parameters);
 
-            //Data management end is not set and up. This test is checking error case.
-            Assert.That(result, Does.Contain("An error occured, please contact to system administrator. ErrorCode:"), "Request send fail.");
+            //Data management end is setup with online mock endpoint in app.config.
+            Assert.That(result, Does.Contain("File read and sent to the database"), "Request send fail.");
 
         }
 
