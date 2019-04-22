@@ -14,7 +14,7 @@ namespace ControlPanel.Services
         bool ZipValidation(string fileExtension);
         string FileProcess(HttpPostedFileBase postedFile);
         string SendRequest(string username, string password, JObject tree);
-
+        string EncryptAesManaged(string raw, string key, string vector);
 
     }
 }

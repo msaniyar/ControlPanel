@@ -143,7 +143,7 @@ namespace ControlPanel.Services
         /// <param name="key"></param>
         /// <param name="vector"></param>
         /// <returns></returns>
-        public static string EncryptAesManaged(string raw, string key, string vector)
+        public string EncryptAesManaged(string raw, string key, string vector)
         {
             try
             {
